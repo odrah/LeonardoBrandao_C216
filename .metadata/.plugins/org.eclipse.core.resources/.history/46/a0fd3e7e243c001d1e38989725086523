@@ -1,0 +1,69 @@
+package br.inatel.labs.labrest.server.controller;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.net.URI;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+import br.inatel.labs.labrest.server.model.Curso;
+
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+class CursoControllerTest {
+	
+	@Autowired
+	private WebTestClient webTestClient;
+	
+	@Test
+	void deveListarCursos() {
+		webTestClient.get()
+			.uri("/curso")
+			.exchange()
+			.expectStatus()
+				.isOk()
+			.expectBody()
+				.returnResult();
+		
+	}
+	
+	
+	@Test
+	void dadoCursoIdValido_quandoGetCursoPorId_entaoRespondeComCursoValido() {
+		
+		Long cursoIdValido = 1L;
+		
+		Curso cursoRespondido = webTestClient.get()
+			.uri("/curso" + cursoIdValido)
+			.exchange()
+			.expectStatus()
+				.isOk()
+			.expectBody(Curso.class)
+				.returnResult()
+				.getResponseBody();
+		
+		
+		assertNotNull(cursoRespondido);
+		assertEquals(cursoRespondido.getId(), cursoIdValido);
+		
+	}
+	
+	@Test
+	void dadoCursoIdValido_quandoGetCursoPorId_entaoRespondeComCursoValido_post() {
+		
+		Long cursoIdValido = 99L;
+		
+		webTestClient.post()
+			.uri("/curso" + cursoIdValido)
+			.exchange()
+			.expectStatus()
+				.isNotFound();
+		
+	}
+	
+
+}
